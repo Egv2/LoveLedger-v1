@@ -28,6 +28,7 @@ model User {
   email               String?           @unique()
   pictureUrl          String?           @default("https://i.imgur.com/ZdJSK3Y.jpeg")
   tokenInvitation     String?
+  address             String?           @unique()
   status              UserStatus        @default(VERIFIED)
   globalRole          String            @default("USER")
   /// @password

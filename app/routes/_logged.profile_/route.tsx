@@ -8,9 +8,11 @@ import { User } from '@prisma/client'
 import { useEffect, useState } from 'react'
 
 import { PwaClient } from '@/plugins/pwa/client'
+import { useConnection } from '@ant-design/web3'
 
 export default function ProfilePage() {
   const { user, refetch: refetchUser } = useUserContext()
+  const { disconnect } = useConnection()
   const { mutateAsync: logout } = Api.authentication.logout.useMutation({
     onSuccess: data => {
       if (data.redirect) {
@@ -55,6 +57,7 @@ export default function ProfilePage() {
 
   const handleClickLogout = async () => {
     setLoadingLogout(true)
+    disconnect()
 
     try {
       await logout()
