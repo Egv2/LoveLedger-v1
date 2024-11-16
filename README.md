@@ -22,7 +22,7 @@ Learn more in the [official documentation](https://dev.marblism.com).
 <p align="center">
 
 <a target="_blank" href="https://www.docker.com/get-started/">![Docker Desktop Version](https://img.shields.io/badge/Docker%20Desktop-4.19.0-black?logo=docker)</a>
-<a target="_blank" href="https://nodejs.org/en">![Node.js version](https://img.shields.io/badge/Node.js-20.11.0-black?logo=nodedotjs)</a>
+<a target="_blank" href="https://nodejs.org/en">![Node.js version](https://img.shields.io/badge/Node.js-^18.17.0%20||%20^20.3.0%20||%20>=21.0.0-black?logo=nodedotjs)</a>
 <a target="_blank" href="https://www.npmjs.com/">![npm Version](https://img.shields.io/badge/npm-10.2.4-black?logo=npm)</a>
 
 </p>
@@ -48,5 +48,3 @@ $ pnpm run dev
 $ pnpm run build
 $ pnpm run start
 ```
-
-
