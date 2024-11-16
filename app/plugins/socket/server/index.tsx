@@ -15,7 +15,7 @@ const startServer = (
   io.on('connection', async socket => {
     const context = await createContext(socket)
 
-    const userId = context.session?.user?.id
+    const userId = context?.session?.user?.id
 
     if (!userId) {
       return
