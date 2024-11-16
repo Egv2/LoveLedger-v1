@@ -27,6 +27,9 @@
   },
   "dependencies": {
     "@ant-design/icons": "5.5.1",
+    "@ant-design/web3": "^1.18.0",
+    "@ant-design/web3-assets": "^1.11.4",
+    "@ant-design/web3-wagmi": "^2.9.3",
     "@aws-sdk/client-s3": "^3.657.0",
     "@aws-sdk/s3-request-presigner": "^3.657.0",
     "@prisma/client": "^5.19.1",
@@ -57,6 +60,7 @@
     "node-mailjet": "^6.0.6",
     "nodemailer": "^6.9.15",
     "openai": "^4.63.0",
+    "optional": "^0.1.4",
     "papaparse": "^5.4.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
@@ -111,5 +115,6 @@
   },
   "zenstack": {
     "schema": "./models/schema.zmodel"
-  }
+  },
+  "packageManager": "pnpm@9.13.0+sha1.f149ab27b27e712ac9a58ce1717c307364ccdca8"
 }
