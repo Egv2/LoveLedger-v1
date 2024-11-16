@@ -1,0 +1,104 @@
+enum UserStatus {
+    INVITED
+    VERIFIED
+}
+
+model User {
+    id                  String            @id @default(uuid())
+    name                String?
+    email               String?           @unique
+    pictureUrl          String?           @default('https://i.imgur.com/ZdJSK3Y.jpeg')
+    tokenInvitation     String?
+
+    status              UserStatus        @default(VERIFIED)
+
+    // this is the role of the user for the application
+    globalRole          String            @default('USER')
+    password            String?           @password @omit
+    createdAt           DateTime          @default(now())
+    updatedAt           DateTime          @updatedAt @default(now())
+
+    pwaSubscriptions    PwaSubscription[] @relation("user")
+
+    proposalsAsSender   Proposal[]        @relation("sender")
+    proposalsAsReceiver Proposal[]        @relation("receiver")
+    marriagesAsPartner1 Marriage[]        @relation("partner1")
+    marriagesAsPartner2 Marriage[]        @relation("partner2")
+
+    @@auth()
+    @@allow("all", auth().id == this.id)
+    @@allow('all', auth().globalRole == 'ADMIN')
+
+    //we only allow that user to register if they don't create an admin role
+    @@allow("create", globalRole != 'ADMIN')
+    @@allow("read", true)
+}
+
+model Proposal {
+
+    id                    String     @id @default(uuid())
+    message               String?
+    status                String
+    walletAddressSender   String?
+    walletAddressReceiver String?
+
+    senderId              String
+    sender                User?      @relation(fields: [senderId], references: [id], name: "sender")
+    receiverId            String
+    receiver              User?      @relation(fields: [receiverId], references: [id], name: "receiver")
+
+    marriages             Marriage[] @relation("proposal")
+    createdAt             DateTime   @default(now())
+    updatedAt             DateTime   @updatedAt @default(now())
+    @@allow("all", true)
+}
+
+model Marriage {
+
+    id                    String        @id @default(uuid())
+    status                String
+    certificateTokenId    String?
+    walletAddressPartner1 String?
+    walletAddressPartner2 String?
+
+    proposalId            String
+    proposal              Proposal?     @relation(fields: [proposalId], references: [id], name: "proposal")
+    partner1Id            String
+    partner1              User?         @relation(fields: [partner1Id], references: [id], name: "partner1")
+    partner2Id            String
+    partner2              User?         @relation(fields: [partner2Id], references: [id], name: "partner2")
+
+    certificates          Certificate[] @relation("marriage")
+    createdAt             DateTime      @default(now())
+    updatedAt             DateTime      @updatedAt @default(now())
+    @@allow("all", true)
+}
+
+model Certificate {
+
+    id              String    @id @default(uuid())
+    nftTokenId      String?
+    imageUrl        String?
+    mintStatus      String?
+    transactionHash String?
+
+    marriageId      String
+    marriage        Marriage? @relation(fields: [marriageId], references: [id], name: "marriage")
+
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt @default(now())
+    @@allow("all", true)
+}
+
+model PwaSubscription {
+    id        String   @id @default(uuid())
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt @default(now())
+
+    userId    String   @default(auth().id)
+    user      User     @relation(fields: [userId], references: [id], name: 'user')
+
+    @@allow("all", true)
+}
+
