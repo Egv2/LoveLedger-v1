@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import { Typography, Card, Row, Col, Tag, Empty, Spin } from 'antd'
 const { Title, Text } = Typography
 import { useUserContext } from '@/core/context'
@@ -7,10 +8,29 @@ import { useUploadPublic } from '@/plugins/upload/client'
 import { SocketClient } from '@/plugins/socket/client'
 import { Api } from '@/core/trpc'
 import { PageLayout } from '@/designSystem'
+import { ethers } from 'ethers';
+import MarriageProposalABI from '../../../abis/MarriageProposal.json';
+import { CONTRACT_ADDRESS } from "../_logged.proposals.new_/route"
+
+export const getProposal = async (proposalId: string) => {
+  console.log("info", CONTRACT_ADDRESS, MarriageProposalABI)
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const marriageProposalContract = new ethers.Contract(CONTRACT_ADDRESS, MarriageProposalABI.abi, provider);
+
+    const parsedProposalId = ethers.BigNumber.from(proposalId);
+    const proposal = await marriageProposalContract.getProposal(parsedProposalId);
+
+    return proposal;
+  } catch (error) {
+    console.error('Error fetching proposal:', error);
+  }
+};
 
 export default function MyProfilePage() {
   const { user } = useUserContext()
   const navigate = useNavigate()
+  const [chainedProposals, setProposal] = useState();
 
   // Fetch proposals with included relations
   const { data: proposals, isLoading: loadingProposals } =
@@ -42,6 +62,14 @@ export default function MyProfilePage() {
         proposal: true,
       },
     })
+
+    useEffect(() => {
+      (async () => {
+        const chained = await Promise.all(proposals?.filter(async prop => await getProposal(prop.onContractId)));
+        setProposal(chained);
+        console.log("chained", chained);
+      })();
+    }, [proposals]);
 
   if (loadingProposals || loadingMarriages) {
     return (
@@ -87,7 +115,8 @@ export default function MyProfilePage() {
             <i className="las la-heart" style={{ marginRight: '8px' }}></i>
             Marriage Proposals
           </Title>
-          {proposals?.length ? (
+          {/* {proposals?.length ? ( */}
+          {chainedProposals?.length ? (
             <Row gutter={[16, 16]}>
               {proposals?.map(proposal => (
                 <Col xs={24} sm={12} key={proposal.id}>

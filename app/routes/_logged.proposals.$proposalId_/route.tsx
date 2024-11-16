@@ -1,4 +1,4 @@
-import { Typography, Card, Button, Space, Spin, Alert, Tag } from 'antd'
+import { Typography, Card, Button, Space, Spin, Alert, Tag, message } from 'antd'
 const { Title, Text, Paragraph } = Typography
 import { useUserContext } from '@/core/context'
 import dayjs from 'dayjs'
@@ -7,6 +7,15 @@ import { useUploadPublic } from '@/plugins/upload/client'
 import { SocketClient } from '@/plugins/socket/client'
 import { Api } from '@/core/trpc'
 import { PageLayout } from '@/designSystem'
+import { ethers } from 'ethers';
+import MarriageProposalABI from '../../../abis/MarriageProposal.json';
+import { CONTRACT_ADDRESS } from "../_logged.proposals.new_/route"
+
+const ProposalStatus = {
+  PENDING: 0,
+  ACCEPTED: 1,
+  REJECTED: 2,
+};
 
 export default function ProposalDetailsPage() {
   const { proposalId } = useParams()
@@ -29,17 +38,35 @@ export default function ProposalDetailsPage() {
   // Mutations for accepting/rejecting proposals
   const { mutateAsync: updateProposal } = Api.proposal.update.useMutation()
 
-  const handleProposalResponse = async (status: 'ACCEPTED' | 'REJECTED') => {
+  const handleProposalResponse = async (status) => {
     try {
-      await updateProposal({
-        where: { id: proposalId },
-        data: { status },
-      })
-      await refetch()
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+  
+      const marriageProposalContract = new ethers.Contract(CONTRACT_ADDRESS, MarriageProposalABI.abi, signer);
+  
+      const statusEnumValue = ProposalStatus[status];
+      const parsedProposalId = ethers.BigNumber.from(proposal.onContractId);
+      const tx = await marriageProposalContract.respondToProposal(parsedProposalId, statusEnumValue);
+
+      await tx.wait();
+
+      try {
+        await updateProposal({
+          where: { id: proposalId },
+          data: { status },
+        })
+        await refetch()
+      } catch (error) {
+        console.error('Error updating proposal:', error)
+      }
+  
+      message.success('Proposal response submitted successfully!');
     } catch (error) {
-      console.error('Error updating proposal:', error)
+      console.error('Error updating proposal:', error);
+      message.error('Failed to update proposal. Please try again.');
     }
-  }
+  };
 
   if (isLoading) {
     return (

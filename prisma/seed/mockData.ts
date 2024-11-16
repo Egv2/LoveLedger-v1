@@ -7,7 +7,8 @@ const splitSql = (sql: string) => {
 }
 
 async function main() {
-  const sql = `
+  const sql = ""
+  const sql1 = `
 
 INSERT INTO "User" ("id", "email", "name", "pictureUrl", "tokenInvitation", "status", "globalRole", "password") VALUES ('254af6f2-9b37-461c-8056-7c4c7c172ab7', '1Mariane72@gmail.com', 'Charlie Brown', 'https://i.imgur.com/YfJQV5z.png?id=3', 'inv123abc', 'VERIFIED', 'USER', '$2b$10$ppubsZypHzkqW9dkhMB97ul2.wSsvaCoDE2CzqIHygddRMKXvpYUC');
 INSERT INTO "User" ("id", "email", "name", "pictureUrl", "tokenInvitation", "status", "globalRole", "password") VALUES ('25d5fddf-1f15-44ec-8f48-668a5ba6efa0', '9Donna.Zieme55@yahoo.com', 'Edward King', 'https://i.imgur.com/YfJQV5z.png?id=11', 'inv345mno', 'VERIFIED', 'USER', '$2b$10$ppubsZypHzkqW9dkhMB97ul2.wSsvaCoDE2CzqIHygddRMKXvpYUC');

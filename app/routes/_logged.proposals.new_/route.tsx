@@ -8,6 +8,10 @@ import { useUploadPublic } from '@/plugins/upload/client'
 import { SocketClient } from '@/plugins/socket/client'
 import { Api } from '@/core/trpc'
 import { PageLayout } from '@/designSystem'
+import { ethers } from 'ethers';
+import MarriageProposalABI from '../../../abis/MarriageProposal.json';
+
+export const CONTRACT_ADDRESS = '0xaC257EEFBcDBb147E301267E7F4056E381dd3002';
 
 export default function SendProposalPage() {
   const { user } = useUserContext()
@@ -33,10 +37,10 @@ export default function SendProposalPage() {
     }
   }, [receiverData])
 
-  const handleSubmit = async (values: { walletAddress: string; message: string }) => {
+  const handleSubmit = async (values) => {
     if (!user) {
-      message.error('You must be logged in to send a proposal')
-      return
+      message.error('You must be logged in to send a proposal');
+      return;
     }
 
     if (!user.address) {
@@ -48,9 +52,28 @@ export default function SendProposalPage() {
       message.error('Receiver not found, the wallet must be connected to one of registered account')
       return
     }
-
+  
     try {
-      setLoading(true)
+      setLoading(true);
+  
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+  
+      const marriageProposalContract = new ethers.Contract(CONTRACT_ADDRESS, MarriageProposalABI.abi, signer);
+  
+      const tx = await marriageProposalContract.createProposal(values.walletAddress, values.message);
+      console.log("tx to", tx.to);
+      console.log("CONTRACT_ADDRESS", CONTRACT_ADDRESS);
+      const receipt = await tx.wait();
+
+      console.log("RECIEPT", receipt);
+      window.reccc = receipt;
+      const event = receipt.events.find(event => event.event === 'ProposalCreated');
+      console.log("event", event);
+      const proposalId = event.args?.proposalId;
+
+      console.log('Created proposal with ID:', proposalId);
+
       const proposal = await createProposal({
         data: {
           status: 'PENDING',
@@ -59,17 +82,56 @@ export default function SendProposalPage() {
           walletAddressSender: user.address,
           senderId: user.id,
           receiverId,
+          onContractId: proposalId._hex,
         },
       })
-
-      message.success('Proposal sent successfully!')
-      navigate(`/proposals/${proposal.id}`)
+      
+      message.success('Proposal sent successfully!');
     } catch (error) {
-      message.error('Failed to send proposal. Please try again.')
+      message.error('Failed to send proposal. Please try again.');
+      console.error(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
+  // const handleSubmit = async (values: { walletAddress: string; message: string }) => {
+  //   if (!user) {
+  //     message.error('You must be logged in to send a proposal')
+  //     return
+  //   }
+
+  //   if (!user.address) {
+  //     message.error('You must verify yourself by connecting wallet to your account')
+  //     return
+  //   }
+
+  //   if (!receiverId) {
+  //     message.error('Receiver not found, the wallet must be connected to one of registered account')
+  //     return
+  //   }
+
+  //   try {
+  //     setLoading(true)
+  //     const proposal = await createProposal({
+  //       data: {
+  //         status: 'PENDING',
+  //         message: values.message,
+  //         walletAddressReceiver: values.walletAddress,
+  //         walletAddressSender: user.address,
+  //         senderId: user.id,
+  //         receiverId,
+  //       },
+  //     })
+
+  //     message.success('Proposal sent successfully!')
+  //     navigate(`/proposals/${proposal.id}`)
+  //   } catch (error) {
+  //     message.error('Failed to send proposal. Please try again.')
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   return (
     <PageLayout layout="narrow">

@@ -10,7 +10,8 @@ import { useUploadPublic } from '@/plugins/upload/client'
 import { SocketClient } from '@/plugins/socket/client'
 import { Api } from '@/core/trpc'
 import { PageLayout } from '@/designSystem'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getProposal } from "../_logged.my-marriages_/route"
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -18,6 +19,7 @@ export default function HomePage() {
   const { disconnect } = useConnection();
   const [account, setAccount] = useState<Account>()
   const { mutateAsync: updateUser } = Api.user.update.useMutation()
+  const [chainedProposals, setProposal] = useState();
 
   // Fetch user's proposals
   const { data: myProposals, isLoading: loadingProposals } =
@@ -78,6 +80,15 @@ export default function HomePage() {
     setAccount(null);
   }
 
+  useEffect(() => {
+    (async () => {
+      console.log("dbed", myProposals)
+      const chained = await Promise.all(myProposals?.filter(async prop => await getProposal(prop.onContractId)));
+      setProposal(chained);
+      console.log("chained", chained);
+    })();
+  }, [myProposals]);
+
   if (loadingProposals || loadingMarriages || loadingRecent) {
     return (
       <PageLayout layout="narrow">
@@ -134,26 +145,26 @@ export default function HomePage() {
               <Title level={4}>
                 <i className="las la-envelope"></i> My Proposals
               </Title>
-              {myProposals?.length ? (
-                myProposals.map(proposal => (
+              {chainedProposals?.length ? (
+                chainedProposals.map(proposal => (
                   <Card
-                    key={proposal.id}
+                    key={proposal?.id}
                     size="small"
                     style={{ marginBottom: '10px' }}
                   >
                     <Row justify="space-between">
                       <Col>
-                        <Text>From: {proposal.sender?.name}</Text>
+                        <Text>From: {proposal?.sender?.name}</Text>
                         <br />
-                        <Text>To: {proposal.receiver?.name}</Text>
+                        <Text>To: {proposal?.receiver?.name}</Text>
                       </Col>
                       <Col>
                         <Text type="secondary">
-                          Status: {proposal.status}
+                          Status: {proposal?.status}
                         </Text>
                         <br />
                         <Text type="secondary">
-                          {dayjs(proposal.createdAt).format('MMM D, YYYY')}
+                          {dayjs(proposal?.createdAt).format('MMM D, YYYY')}
                         </Text>
                       </Col>
                     </Row>

@@ -38,6 +38,7 @@ model User {
 model Proposal {
 
     id                    String     @id @default(uuid())
+    onContractId          String
     message               String?
     status                String
     walletAddressSender   String?
