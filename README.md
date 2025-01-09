@@ -8,9 +8,7 @@ This project was made by me and my dear partner [@susemaa](https://github.com/su
 </div>
 <div style="height: 50px; background: linear-gradient(#000000, transparent);"></div>
 
-## Documentation
 
-Learn more in the [official documentation](https://dev.marblism.com).
 
 ## Installation
 
