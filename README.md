@@ -3,6 +3,7 @@
 <p align="center" style="margin: 0; letter-spacing: 3px;
 text-decoration: none;">
 This project was made by me and my dear partner [@susemaa](https://github.com/susemaa) I met at ETH Global Hackathon Bangkok 2024.
+Used the help of the world's first software-based AI agent of the year! Marblism.
 </p>
 </a>
 </div>
