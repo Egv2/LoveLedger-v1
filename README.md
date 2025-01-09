@@ -1,9 +1,8 @@
 <div style="background: black;">
 
-<a  style="margin: 0;" target="_blank" href="https://marblism.com">
 <p align="center" style="margin: 0; letter-spacing: 3px;
 text-decoration: none;">
-
+This project was made by me and my dear partner [@susemaa](https://github.com/susemaa) I met at ETH Global Hackathon Bangkok 2024.
 </p>
 </a>
 </div>
